@@ -14,6 +14,10 @@
       let onTopOfControlPoint = false;
       let onTopOfCurve = false;
 
+      let showCurveCheckbox = true;
+      let showControlPointsCheckbox = true;
+      let showLinesCheckbox = true;
+
       function calculateBezier(points) {
         result = [];
         start = points[0];
@@ -40,6 +44,16 @@
         }
       }
       function mousePressed() {
+        // check if mouse is outside drawing area
+        if (
+          mouseX < 0 ||
+          mouseX > width ||
+          mouseY < 0 ||
+          mouseY > height - 30
+        ) {
+          return;
+        }
+
         // remove something
         if (mouseButton === RIGHT) {
           // remove point
@@ -72,7 +86,7 @@
       }
 
       let clearButton;
-      skipAddPoint = false;
+      let uiClicked = false;
 
       function setup() {
         createCanvas(400, 400);
@@ -87,8 +101,14 @@
         clearButton.position(14, 380);
         clearButton.mousePressed(() => {
           points = [];
-          skipAddPoint = true;
+          uiClicked = true;
         });
+        showCurveCheckbox = createCheckbox("c", true);
+        showCurveCheckbox.position(65, 380);
+        showLinesCheckbox = createCheckbox("l", true);
+        showLinesCheckbox.position(100, 380);
+        showControlPointsCheckbox = createCheckbox("p", true);
+        showControlPointsCheckbox.position(135, 380);
       }
 
       function draw() {
@@ -132,13 +152,15 @@
           stroke(237, 34, 93);
           strokeWeight(4);
         }
-        for (i = 0; i < thecurve.length - 1; i++) {
-          line(
-            thecurve[i].x,
-            thecurve[i].y,
-            thecurve[i + 1].x,
-            thecurve[i + 1].y
-          );
+        if (showCurveCheckbox.checked()) {
+          for (i = 0; i < thecurve.length - 1; i++) {
+            line(
+              thecurve[i].x,
+              thecurve[i].y,
+              thecurve[i + 1].x,
+              thecurve[i + 1].y
+            );
+          }
         }
 
         // draw points and its lines
@@ -147,14 +169,16 @@
           stroke(237, 34, 93, 50);
           strokeWeight(3);
 
-          if (i < points.length - 1) {
+          if (i < points.length - 1 && showLinesCheckbox.checked()) {
             line(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
           }
 
           // set point color
           stroke(255, 255, 255, 100);
           strokeWeight(6);
-          point(points[i].x, points[i].y);
+          if (showControlPointsCheckbox.checked()) {
+            point(points[i].x, points[i].y);
+          }
         }
 
         // draw point controller
