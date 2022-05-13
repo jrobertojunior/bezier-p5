@@ -6,8 +6,9 @@
     <script>
       points = [];
       resolution = 100; // n points for each curve
+      DISTANCE_TO_SELECT = 15; // distance to select a point
 
-      pointMove = false;
+      pointMoving = false;
       let pointToMove;
 
       function calculateBezier(points) {
@@ -30,32 +31,33 @@
         return result;
       }
       function mouseDragged() {
-        if (pointMove) {
+        if (pointMoving) {
           points[pointToMove].x = mouseX;
           points[pointToMove].y = mouseY;
         }
       }
       function mousePressed() {
-        // if mouse coordinates are on top of a point, remove it
+        // if mouse coordinates are on top of a point, trigger moving behavior
         for (let i = 0; i < points.length; i++) {
-          if (dist(mouseX, mouseY, points[i].x, points[i].y) < 10) {
-            pointMove = true;
+          if (
+            dist(mouseX, mouseY, points[i].x, points[i].y) <= DISTANCE_TO_SELECT
+          ) {
+            pointMoving = true;
             pointToMove = i;
             skipAddPoint = true;
-            break;
+            return;
           }
         }
-      }
-      function mouseReleased() {
-        pointMove = false;
-      }
-
-      function mouseClicked() {
         if (skipAddPoint) {
           skipAddPoint = false;
           return;
         }
         points.push({ x: mouseX, y: mouseY });
+        pointMoving = true;
+        pointToMove = points.length - 1;
+      }
+      function mouseReleased() {
+        pointMoving = false;
       }
 
       function interpolate(t, p0, p1) {
@@ -115,7 +117,15 @@
         strokeWeight(6);
         // draw points
         for (i = 0; i < points.length; i++) {
-          point(points[i].x, points[i].y);
+          // if mouse is on top of a point, draw a circle
+          if (
+            dist(mouseX, mouseY, points[i].x, points[i].y) <= DISTANCE_TO_SELECT
+          ) {
+            circle(mouseX, mouseY, 10);
+          } else {
+            // fill(255, 255, 255);
+            point(points[i].x, points[i].y);
+          }
         }
       }
     </script>
