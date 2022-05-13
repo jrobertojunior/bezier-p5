@@ -10,7 +10,9 @@
       DISTANCE_TO_SELECT = 15; // distance to select a point
 
       pointMoving = false;
-      let pointToMove;
+      let selectedPointIndex;
+      let onTopOfControlPoint = false;
+      let onTopOfCurve = false;
 
       function calculateBezier(points) {
         result = [];
@@ -33,36 +35,34 @@
       }
       function mouseDragged() {
         if (pointMoving) {
-          points[pointToMove].x = mouseX;
-          points[pointToMove].y = mouseY;
+          points[selectedPointIndex].x = mouseX;
+          points[selectedPointIndex].y = mouseY;
         }
       }
       function mousePressed() {
-        // check if there's a point in the mouse position
-        for (let i = 0; i < points.length; i++) {
-          if (
-            dist(mouseX, mouseY, points[i].x, points[i].y) <= DISTANCE_TO_SELECT
-          ) {
-            if (mouseButton === RIGHT) {
-              // remove point
-              points.splice(i, 1);
-              return;
-            }
-            // move point
-            pointMoving = true;
-            pointToMove = i;
-            // skipAddPoint = true;
-            return;
+        // remove something
+        if (mouseButton === RIGHT) {
+          // remove point
+          if (onTopOfControlPoint) {
+            points.splice(selectedPointIndex, 1);
+            selectedPointIndex = undefined;
+            // remove curve
+          } else if (onTopOfCurve) {
+            points = [];
           }
-        }
-        if (skipAddPoint || mouseButton === RIGHT) {
-          skipAddPoint = false;
           return;
         }
+
+        // move point
+        if (onTopOfControlPoint) {
+          pointMoving = true;
+          return;
+        }
+
+        // add point
         points.push({ x: mouseX, y: mouseY });
-        pointMoving = true;
-        pointToMove = points.length - 1;
       }
+
       function mouseReleased() {
         pointMoving = false;
       }
@@ -92,17 +92,46 @@
       }
 
       function draw() {
+        onTopOfControlPoint = false;
+        onTopOfCurve = false;
         clear();
         background(50);
         if (points.length < 1) return;
 
-        // set curve color
-        stroke(237, 34, 93);
-        strokeWeight(4);
-
+        // get the bezier curve
         thecurve = calculateBezier(points);
 
+        // check if mouse is on top of a control point
+        for (let i = 0; i < points.length; i++) {
+          if (
+            dist(mouseX, mouseY, points[i].x, points[i].y) <= DISTANCE_TO_SELECT
+          ) {
+            onTopOfControlPoint = true;
+            selectedPointIndex = i;
+          }
+        }
+        if (!onTopOfControlPoint) {
+          // check if mouse is on top of a bezier curve
+          for (let i = 0; i < thecurve.length - 1; i++) {
+            if (
+              dist(mouseX, mouseY, thecurve[i].x, thecurve[i].y) <=
+              DISTANCE_TO_SELECT
+            ) {
+              onTopOfCurve = true;
+              selectedPointIndex = i;
+            }
+          }
+        }
+
         // draw bezier curve
+        // set curve color
+        if (onTopOfCurve) {
+          stroke(250, 50, 100);
+          strokeWeight(6);
+        } else {
+          stroke(237, 34, 93);
+          strokeWeight(4);
+        }
         for (i = 0; i < thecurve.length - 1; i++) {
           line(
             thecurve[i].x,
@@ -112,27 +141,25 @@
           );
         }
 
-        // draw lines
-        for (i = 0; i < points.length - 1; i++) {
+        // draw points and its lines
+        for (i = 0; i < points.length; i++) {
+          // set line color
           stroke(237, 34, 93, 50);
           strokeWeight(3);
 
-          line(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+          if (i < points.length - 1) {
+            line(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+          }
+
+          // set point color
+          stroke(255, 255, 255, 100);
+          strokeWeight(6);
+          point(points[i].x, points[i].y);
         }
 
-        stroke(255, 255, 255, 100);
-        strokeWeight(6);
-        // draw points
-        for (i = 0; i < points.length; i++) {
-          // if mouse is on top of a point, draw a circle
-          if (
-            dist(mouseX, mouseY, points[i].x, points[i].y) <= DISTANCE_TO_SELECT
-          ) {
-            circle(mouseX, mouseY, 10);
-          } else {
-            // fill(255, 255, 255);
-            point(points[i].x, points[i].y);
-          }
+        // draw point controller
+        if (onTopOfControlPoint) {
+          circle(mouseX, mouseY, 10);
         }
       }
     </script>
