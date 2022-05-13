@@ -4,6 +4,7 @@
     <!-- <h1>Curva Bezier</h1> -->
     <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.js"></script>
     <script>
+      window.addEventListener("contextmenu", (e) => e.preventDefault());
       points = [];
       resolution = 100; // n points for each curve
       DISTANCE_TO_SELECT = 15; // distance to select a point
@@ -37,18 +38,24 @@
         }
       }
       function mousePressed() {
-        // if mouse coordinates are on top of a point, trigger moving behavior
+        // check if there's a point in the mouse position
         for (let i = 0; i < points.length; i++) {
           if (
             dist(mouseX, mouseY, points[i].x, points[i].y) <= DISTANCE_TO_SELECT
           ) {
+            if (mouseButton === RIGHT) {
+              // remove point
+              points.splice(i, 1);
+              return;
+            }
+            // move point
             pointMoving = true;
             pointToMove = i;
-            skipAddPoint = true;
+            // skipAddPoint = true;
             return;
           }
         }
-        if (skipAddPoint) {
+        if (skipAddPoint || mouseButton === RIGHT) {
           skipAddPoint = false;
           return;
         }
