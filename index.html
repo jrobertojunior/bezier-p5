@@ -7,6 +7,9 @@
       points = [];
       resolution = 100; // n points for each curve
 
+      pointMove = false;
+      let pointToMove;
+
       function calculateBezier(points) {
         result = [];
         start = points[0];
@@ -26,13 +29,33 @@
         }
         return result;
       }
+      function mouseDragged() {
+        if (pointMove) {
+          points[pointToMove].x = mouseX;
+          points[pointToMove].y = mouseY;
+        }
+      }
+      function mousePressed() {
+        // if mouse coordinates are on top of a point, remove it
+        for (let i = 0; i < points.length; i++) {
+          if (dist(mouseX, mouseY, points[i].x, points[i].y) < 10) {
+            pointMove = true;
+            pointToMove = i;
+            skipAddPoint = true;
+            break;
+          }
+        }
+      }
+      function mouseReleased() {
+        pointMove = false;
+      }
+
       function mouseClicked() {
-        if (!canAddPoint) {
-          canAddPoint = true;
+        if (skipAddPoint) {
+          skipAddPoint = false;
           return;
         }
         points.push({ x: mouseX, y: mouseY });
-        print(points);
       }
 
       function interpolate(t, p0, p1) {
@@ -40,7 +63,7 @@
       }
 
       let clearButton;
-      canAddPoint = true;
+      skipAddPoint = false;
 
       function setup() {
         createCanvas(400, 400);
@@ -55,7 +78,7 @@
         clearButton.position(14, 380);
         clearButton.mousePressed(() => {
           points = [];
-          canAddPoint = false;
+          skipAddPoint = true;
         });
       }
 
