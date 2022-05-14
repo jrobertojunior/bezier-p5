@@ -155,7 +155,7 @@
         addCurveButton.position(60, height - 20);
         addCurveButton.mousePressed(() => {
           addData();
-          selectNextCurve();
+          currentIndex = data.length - 1;
         });
         removeCurveButton = createButton("del");
         removeCurveButton.position(99, height - 20);
