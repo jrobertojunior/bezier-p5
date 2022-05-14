@@ -10,43 +10,35 @@
     <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.js"></script>
     <script>
       window.addEventListener("contextmenu", (e) => e.preventDefault());
-      curves = [];
-      DISTANCE_TO_SELECT = 15; // distance to select a point
 
-      let curvesIds = [
-        "🔴",
-        "🟢",
-        "🟡",
-        "🔵",
-        "🟣",
-        "🟤",
-        "🌈",
-        // "🟥",
-        // "🟦",
-        // "🟧",
-        // "🟨",
-        // "🟩",
-        // "🟪",
-        // "🟫",
-      ];
-      let selectedCurveIndex = 0;
+      let data;
+      let currentIndex = 1;
+      let resolution = 100;
 
-      pointMoving = false;
-      let selectedPointIndex;
-      let onTopOfControlPoint = false;
-      let onTopOfCurve = false;
-
-      let clearButton;
-      let showCurveCheckbox = true;
-      let showControlPointsCheckbox = true;
-      let showLinesCheckbox = true;
-      let resolutionSlider;
-      let curveSelect;
-      let newCurveButton;
-      let previousCurveButton;
-      let nextCurveButton;
-
+      function initData() {
+        data = [
+          {
+            color: [250, 50, 100], // redish
+            points: [
+              { x: 100, y: 250 },
+              { x: 200, y: 100 },
+              { x: 300, y: 350 },
+              { x: 400, y: 200 },
+            ],
+            curve: [],
+          },
+          {
+            color: [43, 117, 61], // greenish
+            points: [],
+            curve: [],
+          },
+        ];
+      }
+      function interpolate(t, p0, p1) {
+        return { x: (1 - t) * p0.x + t * p1.x, y: (1 - t) * p0.y + t * p1.y };
+      }
       function calculateBezier(points, resolution) {
+        if (points === undefined || points.length < 1) return [];
         result = [];
         start = points[0];
         for (let t = 0; t <= 1; t += 1 / resolution) {
@@ -65,204 +57,77 @@
         }
         return result;
       }
-      function mouseDragged() {
-        if (pointMoving) {
-          curves[0][selectedPointIndex].x = mouseX;
-          curves[0][selectedPointIndex].y = mouseY;
-        }
-      }
+
       function mousePressed() {
-        // check if mouse is outside drawing area
-        if (
-          mouseX < 0 ||
-          mouseX > width ||
-          mouseY < 40 ||
-          mouseY > height - 30
-          // (mouseX > width - 70 && mouseY < 40)
-        ) {
+        print(mouseX, mouseY);
+        // if mouse cursor is close to x 20 y 20
+        if (dist(mouseX, mouseY, 20, 20) <= 15) {
+          currentIndex = (currentIndex + 1) % data.length;
           return;
         }
-
-        // remove something
-        if (mouseButton === RIGHT) {
-          // remove point
-          if (onTopOfControlPoint) {
-            curves[0].splice(selectedPointIndex, 1);
-            selectedPointIndex = undefined;
-            // remove curve
-          } else if (onTopOfCurve) {
-            curves[0] = [];
-          }
-          return;
-        }
-
-        // move point
-        if (onTopOfControlPoint) {
-          pointMoving = true;
-          return;
-        }
-
-        // add point
-        curves[0].push({ x: mouseX, y: mouseY });
-        pointMoving = true;
-      }
-
-      function mouseReleased() {
-        pointMoving = false;
-      }
-
-      function interpolate(t, p0, p1) {
-        return { x: (1 - t) * p0.x + t * p1.x, y: (1 - t) * p0.y + t * p1.y };
+        
+        data[currentIndex].points.push({
+          x: mouseX,
+          y: mouseY,
+        });
       }
 
       function setup() {
         createCanvas(500, 500);
-        strokeWeight(4);
-        curves = [
-          [
-            { x: 63, y: 200 },
-            { x: 174, y: 118 },
-            { x: 215, y: 236 },
-            { x: 331, y: 160 },
-          ],
-        ];
-        clearButton = createButton("clear");
-        clearButton.position(14, height - 20);
-        clearButton.mousePressed(() => {
-          curves[0] = [];
-        });
-        showCurveCheckbox = createCheckbox("💫", true);
-        showCurveCheckbox.position(65, height - 20);
-        showLinesCheckbox = createCheckbox("⚡️", true);
-        showLinesCheckbox.position(100, height - 20);
-        showControlPointsCheckbox = createCheckbox("📍", true);
-        showControlPointsCheckbox.position(135, height - 20);
-
-        resolutionSlider = createSlider(1, 100, 50, 3);
-        resolutionSlider.position(width - 152, height - 20);
-        resolutionSlider.style("width", "150px");
-
-        newCurveButton = createButton("+");
-        newCurveButton.position(width - 60, 14);
-        newCurveButton.mousePressed(() => {
-          // add new curve
-          print(curvesIds[curves.length - 1]);
-          curves.push([]);
-        });
-
-        previousCurveButton = createButton("<");
-        previousCurveButton.position(13, 14);
-        previousCurveButton.mousePressed(() => {
-          selectedCurveIndex = (selectedCurveIndex - 1) % curves.length;
-        });
-
-        nextCurveButton = createButton(">");
-        nextCurveButton.position(70, 14);
-        nextCurveButton.mousePressed(() => {
-          selectedCurveIndex = (selectedCurveIndex + 1) % curves.length;
-        });
-
-        textAlign(RIGHT);
+        initData();
       }
 
       function draw() {
-        onTopOfControlPoint = false;
-        onTopOfCurve = false;
         clear();
-
         background(50);
-        textFont("Georgia");
 
-        textSize(14);
-        fill(255, 255, 255);
-        text(resolutionSlider.value(), width - 160, height - 14);
+        // draw point representing current index
+        strokeWeight(15);
+        stroke(...data[currentIndex].color);
+        point(20, 20);
 
-        textSize(20);
-        text(curvesIds[selectedCurveIndex], 57, 24);
-
-        if (curves[0].length < 1) return;
-
-        let thecurves = [];
-        for (let i = 0; i < curves.length; i++) {
-          // get the bezier curve
-          thecurves[i] = calculateBezier(curves[0], resolutionSlider.value());
+        // calculate bezier
+        for (let i = 0; i < data.length; i++) {
+          data[i].curve = calculateBezier(data[i].points, resolution);
         }
 
-        // check if mouse is on top of a control point
-        for (let c = 0; c < curves.length; c++) {
-          for (let i = 0; i < curves[0].length; i++) {
-            if (
-              dist(mouseX, mouseY, curves[c][i].x, curves[c][i].y) <=
-              DISTANCE_TO_SELECT
-            ) {
-              onTopOfControlPoint = true;
-              selectedPointIndex = i;
-            }
-          }
-        }
-        if (!onTopOfControlPoint) {
-          // check if mouse is on top of a bezier curve
-          for (let c = 0; c < thecurves.length; c++) {
-            for (let i = 0; i < thecurves[c].length - 1; i++) {
-              if (
-                dist(mouseX, mouseY, thecurves[c][i].x, thecurves[c][i].y) <=
-                DISTANCE_TO_SELECT
-              ) {
-                onTopOfCurve = true;
-                selectedPointIndex = i;
-              }
-            }
-          }
-        }
-
-        // draw bezier curve
-        // set curve color
-        if (onTopOfCurve) {
-          stroke(250, 50, 100);
-          strokeWeight(6);
-        } else {
-          stroke(237, 34, 93);
-          strokeWeight(4);
-        }
-        if (showCurveCheckbox.checked()) {
-          for (let c = 0; c < thecurves.length; c++) {
-            for (i = 0; i < thecurves[c].length - 1; i++) {
+        for (let i = 0; i < data.length; i++) {
+          // draw points and lines
+          for (let p = 0; p < data[i].points.length; p++) {
+            // make line brighter and translucid
+            strokeWeight(5);
+            stroke(
+              data[i].color[0] + 50,
+              data[i].color[1] + 50,
+              data[i].color[2] + 50,
+              50
+            );
+            if (p < data[i].points.length - 1) {
               line(
-                thecurves[c][i].x,
-                thecurves[c][i].y,
-                thecurves[c][i + 1].x,
-                thecurves[c][i + 1].y
+                data[i].points[p].x,
+                data[i].points[p].y,
+                data[i].points[p + 1].x,
+                data[i].points[p + 1].y
+              );
+            }
+            strokeWeight(9);
+            stroke(data[i].color[0], data[i].color[1], data[i].color[2]);
+            point(data[i].points[p].x, data[i].points[p].y);
+          }
+
+          // draw curve
+          stroke(...data[i].color);
+          strokeWeight(5);
+          if (data[i].curve.length > 0) {
+            for (let p = 0; p < data[i].curve.length - 1; p++) {
+              line(
+                data[i].curve[p].x,
+                data[i].curve[p].y,
+                data[i].curve[p + 1].x,
+                data[i].curve[p + 1].y
               );
             }
           }
-        }
-
-        // draw curves[0] and its lines
-        for (i = 0; i < curves[0].length; i++) {
-          // set line color
-          stroke(237, 34, 93, 50);
-          strokeWeight(3);
-
-          if (i < curves[0].length - 1 && showLinesCheckbox.checked()) {
-            line(
-              curves[0][i].x,
-              curves[0][i].y,
-              curves[0][i + 1].x,
-              curves[0][i + 1].y
-            );
-          }
-
-          // set point color
-          stroke(255, 255, 255, 100);
-          strokeWeight(6);
-          if (showControlPointsCheckbox.checked()) {
-            point(curves[0][i].x, curves[0][i].y);
-          }
-        }
-
-        // draw point controller
-        if (onTopOfControlPoint) {
-          circle(mouseX, mouseY, 10);
         }
       }
     </script>
