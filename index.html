@@ -13,7 +13,11 @@
 
       let data;
       let currentIndex = 0;
-      let resolution = 100;
+
+      // state variables
+      let onTopOfPoint = false;
+      let pointIndex;
+      let isMovingPoint = false;
 
       // ui variables
       let clearButton;
@@ -84,8 +88,18 @@
         return result;
       }
 
+      function mouseDragged() {
+        if (isMovingPoint) {
+          data[currentIndex].points[pointIndex] = { x: mouseX, y: mouseY };
+        }
+      }
+
       function mousePressed() {
-        print(mouseX, mouseY);
+        if (onTopOfPoint) {
+          isMovingPoint = true;
+          return;
+        }
+
         // if mouse cursor is close to x 20 y 20 (change curve button)
         if (dist(mouseX, mouseY, 20, 20) <= 15) {
           selectNextCurve();
@@ -131,13 +145,14 @@
       }
 
       function draw() {
+        onTopOfPoint = false;
         clear();
         background(50);
 
         stroke(255, 255, 255);
         text(resolutionSlider.value(), width - 180, height - 14);
 
-        // draw point representing current index
+        // draw point representing current index (UI)
         strokeWeight(15);
         stroke(...data[currentIndex].color);
         point(20, 20);
@@ -151,8 +166,8 @@
         }
 
         for (let i = 0; i < data.length; i++) {
-          // draw points
-          if (drawControlPointsCheckbox.checked()) {
+          // draw lines
+          if (drawLinesCheckbox.checked()) {
             for (let p = 0; p < data[i].points.length; p++) {
               // make line brighter and translucid
               strokeWeight(5);
@@ -174,15 +189,31 @@
           }
 
           // draw lines
-          if (drawLinesCheckbox.checked()) {
+          if (drawControlPointsCheckbox.checked()) {
             for (let p = 0; p < data[i].points.length; p++) {
-              strokeWeight(9);
-              stroke(data[i].color[0], data[i].color[1], data[i].color[2]);
-              point(data[i].points[p].x, data[i].points[p].y);
+              // check if mouse is on top of point
+              if (
+                dist(
+                  data[i].points[p].x,
+                  data[i].points[p].y,
+                  mouseX,
+                  mouseY
+                ) <= 5
+              ) {
+                strokeWeight(15);
+                stroke(255, 255, 255, 100);
+                point(mouseX, mouseY);
+                onTopOfPoint = true;
+                pointIndex = p;
+              } else {
+                strokeWeight(9);
+                stroke(...data[i].color);
+                point(data[i].points[p].x, data[i].points[p].y);
+              }
             }
           }
 
-          // draw curve
+          // draw bezier curve
           if (drawCurveCheckbox.checked()) {
             stroke(...data[i].color);
             strokeWeight(5);
