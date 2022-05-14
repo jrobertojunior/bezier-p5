@@ -185,7 +185,7 @@
           if (drawLinesCheckbox.checked()) {
             for (let p = 0; p < data[i].points.length; p++) {
               // make line brighter and translucid
-              strokeWeight(25);
+              strokeWeight(50);
               stroke(
                 data[i].color[0] + 50,
                 data[i].color[1] + 50,
@@ -222,7 +222,7 @@
                 onTopOfPoint = true;
                 pointIndex = p;
               } else {
-                strokeWeight(30);
+                strokeWeight(60);
                 stroke(...data[i].color);
                 point(data[i].points[p].x, data[i].points[p].y);
               }
@@ -232,7 +232,7 @@
           // draw bezier curve
           if (drawCurveCheckbox.checked()) {
             stroke(...data[i].color);
-            strokeWeight(25);
+            strokeWeight(50);
             if (data[i].curve.length > 0 && draw) {
               for (let p = 0; p < data[i].curve.length - 1; p++) {
                 line(
