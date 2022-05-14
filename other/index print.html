@@ -1,10 +1,5 @@
 <html>
-  <head> </head>
-  <link
-    rel="icon"
-    href="favicon.ico"
-    type="image/x-icon"
-  />
+  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
   <body>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.js"></script>
     <script>
@@ -190,7 +185,7 @@
           if (drawLinesCheckbox.checked()) {
             for (let p = 0; p < data[i].points.length; p++) {
               // make line brighter and translucid
-              strokeWeight(5);
+              strokeWeight(25);
               stroke(
                 data[i].color[0] + 50,
                 data[i].color[1] + 50,
@@ -227,7 +222,7 @@
                 onTopOfPoint = true;
                 pointIndex = p;
               } else {
-                strokeWeight(9);
+                strokeWeight(30);
                 stroke(...data[i].color);
                 point(data[i].points[p].x, data[i].points[p].y);
               }
@@ -237,7 +232,7 @@
           // draw bezier curve
           if (drawCurveCheckbox.checked()) {
             stroke(...data[i].color);
-            strokeWeight(5);
+            strokeWeight(25);
             if (data[i].curve.length > 0 && draw) {
               for (let p = 0; p < data[i].curve.length - 1; p++) {
                 line(
