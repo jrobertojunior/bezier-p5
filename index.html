@@ -91,12 +91,14 @@
 
       function mouseDragged() {
         if (isMovingPoint) {
+          print("dragging " + pointIndex);
           data[currentIndex].points[pointIndex] = { x: mouseX, y: mouseY };
         }
       }
 
       function mouseReleased() {
         isMovingPoint = false;
+        onTopOfPoint = false;
       }
 
       function mousePressed() {
@@ -109,22 +111,27 @@
         // ignore ui area
         if (mouseY > height - 30) return;
 
+        // remove point
         if (mouseButton === RIGHT) {
-          // remove point
           data[currentIndex].points.splice(pointIndex, 1);
           return;
         }
 
+        // move point
         if (onTopOfPoint) {
           isMovingPoint = true;
           return;
         }
 
+        print("add");
+        // add point
         data[currentIndex].points.push({
           x: mouseX,
           y: mouseY,
         });
         isMovingPoint = true;
+
+        print(data[currentIndex].points);
       }
 
       function setup() {
@@ -135,8 +142,9 @@
         clearButton = createButton("clear");
         clearButton.position(14, height - 20);
         clearButton.mousePressed(() => {
-          data = [];
+          // data = [];
           addData();
+          data = [data[data.length - 1]];
           currentIndex = 0;
         });
         addCurveButton = createButton("add");
@@ -161,7 +169,7 @@
         drawLinesCheckbox.position(180, height - 19);
         drawControlPointsCheckbox = createCheckbox("📍", true);
         drawControlPointsCheckbox.position(220, height - 19);
-        resolutionSlider = createSlider(1, 100, 50, 3);
+        resolutionSlider = createSlider(1, 100, 70, 3);
         resolutionSlider.position(width - 152, height - 20);
         resolutionSlider.style("width", "150px");
       }
@@ -172,6 +180,7 @@
         background(50);
 
         stroke(255, 255, 255);
+        fill(0);
         text(resolutionSlider.value(), width - 180, height - 14);
 
         // draw point representing current index (UI)
