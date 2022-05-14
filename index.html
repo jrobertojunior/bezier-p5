@@ -94,6 +94,10 @@
         }
       }
 
+      function mouseReleased() {
+        isMovingPoint = false;
+      }
+
       function mousePressed() {
         if (onTopOfPoint) {
           isMovingPoint = true;
@@ -113,6 +117,7 @@
           x: mouseX,
           y: mouseY,
         });
+        isMovingPoint = true;
       }
 
       function setup() {
@@ -188,7 +193,7 @@
             }
           }
 
-          // draw lines
+          // draw points
           if (drawControlPointsCheckbox.checked()) {
             for (let p = 0; p < data[i].points.length; p++) {
               // check if mouse is on top of point
