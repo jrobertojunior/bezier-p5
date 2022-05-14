@@ -125,11 +125,17 @@
         drawLinesCheckbox.position(150, height - 19);
         drawControlPointsCheckbox = createCheckbox("📍", true);
         drawControlPointsCheckbox.position(190, height - 19);
+        resolutionSlider = createSlider(1, 100, 50, 3);
+        resolutionSlider.position(width - 152, height - 20);
+        resolutionSlider.style("width", "150px");
       }
 
       function draw() {
         clear();
         background(50);
+
+        stroke(255, 255, 255);
+        text(resolutionSlider.value(), width - 180, height - 14);
 
         // draw point representing current index
         strokeWeight(15);
@@ -138,7 +144,10 @@
 
         // calculate bezier
         for (let i = 0; i < data.length; i++) {
-          data[i].curve = calculateBezier(data[i].points, resolution);
+          data[i].curve = calculateBezier(
+            data[i].points,
+            resolutionSlider.value()
+          );
         }
 
         for (let i = 0; i < data.length; i++) {
