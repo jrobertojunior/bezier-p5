@@ -1,6 +1,13 @@
 <html>
   <head> </head>
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <style>
+    html,
+    body {
+      background-color: rgb(50, 50, 50);
+      overflow: hidden;
+    }
+  </style>
   <body>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.js"></script>
     <script>
@@ -120,8 +127,12 @@
         isMovingPoint = true;
       }
 
+      // function windowResized() {
+      //   resizeCanvas(windowWidth - 16, windowHeight - 16);
+      // }
+
       function setup() {
-        createCanvas(500, 500);
+        createCanvas(windowWidth - 16, windowHeight - 16);
         initData();
 
         // ui setup
