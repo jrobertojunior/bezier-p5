@@ -48,6 +48,12 @@
         ];
       }
 
+      function log() {
+        print(
+          `currentIndex: ${currentIndex}\nonTopOfPoint: ${onTopOfPoint}\npointIndex: ${pointIndex}\nisMovingPoint: ${isMovingPoint}`
+        );
+      }
+
       function addData() {
         data.push({
           // add random color
@@ -90,8 +96,7 @@
       }
 
       function mouseDragged() {
-        if (isMovingPoint) {
-          print("dragging " + pointIndex);
+        if (isMovingPoint && onTopOfPoint) {
           data[currentIndex].points[pointIndex] = { x: mouseX, y: mouseY };
         }
       }
@@ -123,7 +128,6 @@
           return;
         }
 
-        print("add");
         // add point
         data[currentIndex].points.push({
           x: mouseX,
