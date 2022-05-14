@@ -12,8 +12,13 @@
       window.addEventListener("contextmenu", (e) => e.preventDefault());
 
       let data;
-      let currentIndex = 1;
+      let currentIndex = 0;
       let resolution = 100;
+
+      // ui variables
+      let clearButton;
+      let addDataButton;
+      let resolutionSlider;
 
       function initData() {
         data = [
@@ -34,6 +39,24 @@
           },
         ];
       }
+
+      function addData() {
+        data.push({
+          // add random color
+          color: [
+            Math.floor(Math.random() * 255),
+            Math.floor(Math.random() * 255),
+            Math.floor(Math.random() * 255),
+          ],
+          points: [],
+          curve: [],
+        });
+      }
+
+      function selectNextCurve() {
+        currentIndex = (currentIndex + 1) % data.length;
+      }
+
       function interpolate(t, p0, p1) {
         return { x: (1 - t) * p0.x + t * p1.x, y: (1 - t) * p0.y + t * p1.y };
       }
@@ -60,12 +83,15 @@
 
       function mousePressed() {
         print(mouseX, mouseY);
-        // if mouse cursor is close to x 20 y 20
+        // if mouse cursor is close to x 20 y 20 (change curve button)
         if (dist(mouseX, mouseY, 20, 20) <= 15) {
-          currentIndex = (currentIndex + 1) % data.length;
+          selectNextCurve();
           return;
         }
-        
+
+        // ignore ui area
+        if (mouseY > height - 30) return;
+
         data[currentIndex].points.push({
           x: mouseX,
           y: mouseY,
@@ -75,6 +101,24 @@
       function setup() {
         createCanvas(500, 500);
         initData();
+
+        // ui setup
+        clearButton = createButton("clear");
+        clearButton.position(14, height - 20);
+        clearButton.mousePressed(() => {
+          data = [];
+          addData();
+          // for (let i = 0; i < data.length; i++) {
+          //   data[i].points = [];
+          // }
+        });
+        addDataButton = createButton("add");
+        addDataButton.position(60, height - 20);
+        addDataButton.mousePressed(() => {
+          addData();
+          selectNextCurve();
+          // print(data)
+        });
       }
 
       function draw() {
