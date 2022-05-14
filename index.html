@@ -19,6 +19,9 @@
       let clearButton;
       let addDataButton;
       let resolutionSlider;
+      let drawCurveCheckbox;
+      let drawControlPointsCheckbox;
+      let drawLinesCheckbox;
 
       function initData() {
         data = [
@@ -32,11 +35,11 @@
             ],
             curve: [],
           },
-          {
-            color: [43, 117, 61], // greenish
-            points: [],
-            curve: [],
-          },
+          // {
+          //   color: [43, 117, 61], // greenish
+          //   points: [],
+          //   curve: [],
+          // },
         ];
       }
 
@@ -108,17 +111,20 @@
         clearButton.mousePressed(() => {
           data = [];
           addData();
-          // for (let i = 0; i < data.length; i++) {
-          //   data[i].points = [];
-          // }
+          currentIndex = 0;
         });
         addDataButton = createButton("add");
         addDataButton.position(60, height - 20);
         addDataButton.mousePressed(() => {
           addData();
           selectNextCurve();
-          // print(data)
         });
+        drawCurveCheckbox = createCheckbox("💫", true);
+        drawCurveCheckbox.position(110, height - 19);
+        drawLinesCheckbox = createCheckbox("⚡️", true);
+        drawLinesCheckbox.position(150, height - 19);
+        drawControlPointsCheckbox = createCheckbox("📍", true);
+        drawControlPointsCheckbox.position(190, height - 19);
       }
 
       function draw() {
@@ -136,40 +142,50 @@
         }
 
         for (let i = 0; i < data.length; i++) {
-          // draw points and lines
-          for (let p = 0; p < data[i].points.length; p++) {
-            // make line brighter and translucid
-            strokeWeight(5);
-            stroke(
-              data[i].color[0] + 50,
-              data[i].color[1] + 50,
-              data[i].color[2] + 50,
-              50
-            );
-            if (p < data[i].points.length - 1) {
-              line(
-                data[i].points[p].x,
-                data[i].points[p].y,
-                data[i].points[p + 1].x,
-                data[i].points[p + 1].y
+          // draw points
+          if (drawControlPointsCheckbox.checked()) {
+            for (let p = 0; p < data[i].points.length; p++) {
+              // make line brighter and translucid
+              strokeWeight(5);
+              stroke(
+                data[i].color[0] + 50,
+                data[i].color[1] + 50,
+                data[i].color[2] + 50,
+                50
               );
+              if (p < data[i].points.length - 1) {
+                line(
+                  data[i].points[p].x,
+                  data[i].points[p].y,
+                  data[i].points[p + 1].x,
+                  data[i].points[p + 1].y
+                );
+              }
             }
-            strokeWeight(9);
-            stroke(data[i].color[0], data[i].color[1], data[i].color[2]);
-            point(data[i].points[p].x, data[i].points[p].y);
+          }
+
+          // draw lines
+          if (drawLinesCheckbox.checked()) {
+            for (let p = 0; p < data[i].points.length; p++) {
+              strokeWeight(9);
+              stroke(data[i].color[0], data[i].color[1], data[i].color[2]);
+              point(data[i].points[p].x, data[i].points[p].y);
+            }
           }
 
           // draw curve
-          stroke(...data[i].color);
-          strokeWeight(5);
-          if (data[i].curve.length > 0) {
-            for (let p = 0; p < data[i].curve.length - 1; p++) {
-              line(
-                data[i].curve[p].x,
-                data[i].curve[p].y,
-                data[i].curve[p + 1].x,
-                data[i].curve[p + 1].y
-              );
+          if (drawCurveCheckbox.checked()) {
+            stroke(...data[i].color);
+            strokeWeight(5);
+            if (data[i].curve.length > 0 && draw) {
+              for (let p = 0; p < data[i].curve.length - 1; p++) {
+                line(
+                  data[i].curve[p].x,
+                  data[i].curve[p].y,
+                  data[i].curve[p + 1].x,
+                  data[i].curve[p + 1].y
+                );
+              }
             }
           }
         }
