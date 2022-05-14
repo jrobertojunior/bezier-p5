@@ -215,6 +215,7 @@
             for (let p = 0; p < data[i].points.length; p++) {
               // check if mouse is on top of point
               if (
+                i === currentIndex &&
                 dist(
                   data[i].points[p].x,
                   data[i].points[p].y,
