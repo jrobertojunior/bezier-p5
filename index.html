@@ -100,11 +100,6 @@
       }
 
       function mousePressed() {
-        if (onTopOfPoint) {
-          isMovingPoint = true;
-          return;
-        }
-
         // if mouse cursor is close to x 20 y 20 (change curve button)
         if (dist(mouseX, mouseY, 20, 20) <= 15) {
           selectNextCurve();
@@ -113,6 +108,17 @@
 
         // ignore ui area
         if (mouseY > height - 30) return;
+
+        if (mouseButton === RIGHT) {
+          // remove point
+          data[currentIndex].points.splice(pointIndex, 1);
+          return;
+        }
+
+        if (onTopOfPoint) {
+          isMovingPoint = true;
+          return;
+        }
 
         data[currentIndex].points.push({
           x: mouseX,
