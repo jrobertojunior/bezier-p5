@@ -21,7 +21,8 @@
 
       // ui variables
       let clearButton;
-      let addDataButton;
+      let addCurveButton;
+      let removeCurveButton;
       let resolutionSlider;
       let drawCurveCheckbox;
       let drawControlPointsCheckbox;
@@ -132,18 +133,28 @@
           addData();
           currentIndex = 0;
         });
-        addDataButton = createButton("add");
-        addDataButton.position(60, height - 20);
-        addDataButton.mousePressed(() => {
+        addCurveButton = createButton("add");
+        addCurveButton.position(60, height - 20);
+        addCurveButton.mousePressed(() => {
           addData();
           selectNextCurve();
         });
+        removeCurveButton = createButton("del");
+        removeCurveButton.position(99, height - 20);
+        removeCurveButton.mousePressed(() => {
+          // remove current index curve
+          data.splice(currentIndex, 1);
+          if (data.length === 0) {
+            addData();
+          }
+          selectNextCurve();
+        });
         drawCurveCheckbox = createCheckbox("💫", true);
-        drawCurveCheckbox.position(110, height - 19);
+        drawCurveCheckbox.position(140, height - 19);
         drawLinesCheckbox = createCheckbox("⚡️", true);
-        drawLinesCheckbox.position(150, height - 19);
+        drawLinesCheckbox.position(180, height - 19);
         drawControlPointsCheckbox = createCheckbox("📍", true);
-        drawControlPointsCheckbox.position(190, height - 19);
+        drawControlPointsCheckbox.position(220, height - 19);
         resolutionSlider = createSlider(1, 100, 50, 3);
         resolutionSlider.position(width - 152, height - 20);
         resolutionSlider.style("width", "150px");
