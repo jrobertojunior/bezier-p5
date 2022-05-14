@@ -87,6 +87,49 @@
         return result;
       }
 
+
+      function touchMoved() {
+        if (isMovingPoint && onTopOfPoint) {
+          data[currentIndex].points[pointIndex] = { x: mouseX, y: mouseY };
+        }
+      }
+
+      function touchEnded() {
+        isMovingPoint = false;
+        onTopOfPoint = false;
+      }
+
+      function touchStarted() {
+        // if mouse cursor is close to x 20 y 20 (change curve button)
+        if (dist(mouseX, mouseY, 20, 20) <= 15) {
+          selectNextCurve();
+          createColorPickerWithCurveColor();
+          return;
+        }
+
+        // ignore ui area
+        if (mouseY > height - 30 || (mouseY < 35 && mouseX < 100)) return;
+
+        // remove point
+        if (mouseButton === RIGHT) {
+          if (onTopOfPoint) data[currentIndex].points.splice(pointIndex, 1);
+          return;
+        }
+
+        // move point
+        if (onTopOfPoint) {
+          isMovingPoint = true;
+          return;
+        }
+
+        // add point
+        data[currentIndex].points.push({
+          x: mouseX,
+          y: mouseY,
+        });
+        isMovingPoint = true;
+      }
+
       function mouseDragged() {
         if (isMovingPoint && onTopOfPoint) {
           data[currentIndex].points[pointIndex] = { x: mouseX, y: mouseY };
