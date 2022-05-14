@@ -29,6 +29,7 @@
       let drawCurveCheckbox;
       let drawControlPointsCheckbox;
       let drawLinesCheckbox;
+      let colorPicker;
 
       function initData() {
         data = [
@@ -101,11 +102,12 @@
         // if mouse cursor is close to x 20 y 20 (change curve button)
         if (dist(mouseX, mouseY, 20, 20) <= 15) {
           selectNextCurve();
+          createColorPickerWithCurveColor();
           return;
         }
 
         // ignore ui area
-        if (mouseY > height - 30) return;
+        if (mouseY > height - 30 || (mouseY < 35 && mouseX < 100)) return;
 
         // remove point
         if (mouseButton === RIGHT) {
@@ -125,6 +127,11 @@
           y: mouseY,
         });
         isMovingPoint = true;
+      }
+
+      function createColorPickerWithCurveColor() {
+        colorPicker = createColorPicker(data[currentIndex].color);
+        colorPicker.position(50, 14);
       }
 
       // function windowResized() {
@@ -148,6 +155,8 @@
         addCurveButton.mousePressed(() => {
           addData();
           currentIndex = data.length - 1;
+          
+          createColorPickerWithCurveColor();
         });
         removeCurveButton = createButton("del");
         removeCurveButton.position(99, height - 20);
@@ -168,6 +177,8 @@
         resolutionSlider = createSlider(1, 100, 70, 3);
         resolutionSlider.position(width - 152, height - 20);
         resolutionSlider.style("width", "150px");
+
+        createColorPickerWithCurveColor();
       }
 
       function draw() {
@@ -191,6 +202,9 @@
             resolutionSlider.value()
           );
         }
+
+        // change curve color
+        data[currentIndex].color = colorPicker.color().levels;
 
         for (let i = 0; i < data.length; i++) {
           // draw lines
