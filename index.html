@@ -87,7 +87,6 @@
         return result;
       }
 
-
       function touchMoved() {
         if (isMovingPoint && onTopOfPoint) {
           data[currentIndex].points[pointIndex] = { x: mouseX, y: mouseY };
@@ -198,7 +197,7 @@
         addCurveButton.mousePressed(() => {
           addData();
           currentIndex = data.length - 1;
-          
+
           createColorPickerWithCurveColor();
         });
         removeCurveButton = createButton("del");
@@ -210,6 +209,7 @@
             addData();
           }
           selectNextCurve();
+          createColorPickerWithCurveColor();
         });
         drawCurveCheckbox = createCheckbox("💫", true);
         drawCurveCheckbox.position(140, height - 19);
